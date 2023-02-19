@@ -14,14 +14,12 @@ const User: FC = () => {
 	)
 	const router = useRouter()
 	let { username, profileImage } = router.query
-	console.log('*****image 1=', profileImage)
-	//  in case refresh the  current page ,
+
 	if (!username || !profileImage) {
 		if (typeof window !== 'undefined') {
 			const params = new URLSearchParams(window.location.search)
 			username = params.get('username') as string
 			profileImage = params.get('profileImage') as string
-			console.log('********', profileImage)
 		}
 	}
 	const incrementUserLike = (username: string) => {

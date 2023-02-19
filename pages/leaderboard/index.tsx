@@ -4,11 +4,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 const Leaderboard: FC = () => {
 	const [leaderboard, setLeaderboard] = useState([])
-	// const pictureUrl=
+
 	const fetchLeaderboard = async () => {
 		try {
 			const response = await axios.get('/api/leaderboard')
-
 			setLeaderboard(response.data.leaderboard)
 		} catch (error) {
 			console.error(error)
