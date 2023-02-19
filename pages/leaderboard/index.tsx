@@ -21,9 +21,10 @@ const Leaderboard: FC = () => {
 	}, [])
 	return (
 		<>
-			<div className="w-full h-160 mb-100 flex flex-col items-center justify-center space-y-12 px-4 sm:px-8 md:px-16 lg:px-24 xl:px-32">
+			<div className="sticky top-0 bg-white z-10 text-center">
 				<h1 className="text-4xl font-bold">Leaderboard</h1>
-
+			</div>
+			<div className="w-full h-160 mb-100 flex flex-col items-center justify-center space-y-12 px-4 sm:px-8 md:px-16 lg:px-24 xl:px-32">
 				<ul className="space-y-4 ">
 					{leaderboard.map((user: UserDetails) => (
 						<li
