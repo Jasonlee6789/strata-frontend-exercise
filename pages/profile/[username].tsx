@@ -29,7 +29,6 @@ const User: FC = () => {
 	const fetchProfileData = async () => {
 		try {
 			const response = await axios.get(`/api/profile/${username}`)
-
 			setProfileData(response.data)
 		} catch (error) {
 			console.error(error)
@@ -42,19 +41,6 @@ const User: FC = () => {
 	useEffect(() => {
 		fetchProfileData()
 	}, [])
-
-	useEffect(() => {
-		// Initialize user likes from local storage
-		const likesFromStorage = localStorage.getItem('userLikes')
-		if (likesFromStorage) {
-			setUserLikes(JSON.parse(likesFromStorage))
-		}
-	}, [])
-
-	useEffect(() => {
-		// Save user likes to local storage whenever it changes
-		localStorage.setItem('userLikes', JSON.stringify(userLikes))
-	}, [userLikes])
 	return (
 		<>
 			<div className="w-full h-80 flex flex-col items-center justify-center space-y-12">
