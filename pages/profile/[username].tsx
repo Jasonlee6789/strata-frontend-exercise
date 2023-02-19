@@ -6,10 +6,12 @@ import { LikeOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 import { UserLikesContext } from '../../pages/_app'
 const User: FC = () => {
-	const { userLikes, setUserLikes } = useContext(UserLikesContext)
+	const { userLikes, setUserLikes, isLike, setIsLike } =
+		useContext(UserLikesContext)
 
 	const router = useRouter()
-	let { username, profileImage = '' } = router.query
+	let username = router.query.username as string
+	let profileImage = (router.query.profileImage as string) || ''
 
 	// Add useEffect to check if running in the client and update state
 	useEffect(() => {
@@ -19,12 +21,7 @@ const User: FC = () => {
 			profileImage = params.get('profileImage') as string
 		}
 	}, [])
-	const incrementUserLike = (username: string) => {
-		setUserLikes((prevLikes) => ({
-			...prevLikes,
-			[username]: (prevLikes[username] || 0) + 1,
-		}))
-	}
+
 	const [profileData, setProfileData] = useState<ProfileData>()
 	const fetchProfileData = async () => {
 		try {
@@ -36,8 +33,51 @@ const User: FC = () => {
 	}
 	const handleLikeClick = () => {
 		// Increment the number of likes for this user
-		incrementUserLike(username as string)
+		if (isLike[username]) {
+			setUserLikes((prevLikes) => ({
+				...prevLikes,
+				[username]: (prevLikes[username] || 0) - 1,
+			}))
+			setIsLike((prevIsLikes) => ({
+				...prevIsLikes,
+				[username]: false,
+			}))
+		} else {
+			setUserLikes((prevLikes) => ({
+				...prevLikes,
+				[username]: (prevLikes[username] || 0) + 1,
+			}))
+			setIsLike((prevIsLikes) => ({
+				...prevIsLikes,
+				[username]: true,
+			}))
+		}
 	}
+	useEffect(() => {
+		// Read user likes from local storage if available
+		const storedLikes = localStorage.getItem('userLikes')
+		const storedIsLikes = localStorage.getItem('isLike')
+		if (storedLikes) {
+			setUserLikes(JSON.parse(storedLikes))
+		}
+		if (storedIsLikes) {
+			setIsLike(JSON.parse(storedIsLikes))
+		}
+	}, [setUserLikes, setIsLike])
+
+	useEffect(() => {
+		const handleUnload = () => {
+			localStorage.setItem('userLikes', JSON.stringify(userLikes))
+			localStorage.setItem('isLike', JSON.stringify(isLike))
+		}
+
+		window.addEventListener('beforeunload', handleUnload)
+
+		return () => {
+			window.removeEventListener('beforeunload', handleUnload)
+		}
+	}, [userLikes, isLike])
+
 	useEffect(() => {
 		fetchProfileData()
 	}, [])
@@ -54,8 +94,12 @@ const User: FC = () => {
 					/>
 				)}
 				<div>{profileData?.username}</div>
-				<Button icon={<LikeOutlined />} onClick={handleLikeClick}>
-					Like {userLikes[username as string]}
+				<Button
+					className={isLike[username] ? 'bg-indigo-500' : ''}
+					icon={<LikeOutlined />}
+					onClick={handleLikeClick}
+				>
+					Like {userLikes[username]}
 				</Button>
 			</div>
 		</>
