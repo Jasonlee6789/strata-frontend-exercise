@@ -4,14 +4,10 @@ import Image from 'next/image'
 import { Button } from 'antd'
 import { LikeOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/router'
-import React from 'react'
-const UserLikesContext = React.createContext<{
-	[userlike: string]: number
-}>({})
+import { UserLikesContext } from '../../pages/_app'
 const User: FC = () => {
-	const [userLikes, setUserLikes] = useState<{ [username: string]: number }>(
-		{}
-	)
+	const { userLikes, setUserLikes } = useContext(UserLikesContext)
+
 	const router = useRouter()
 	let { username, profileImage } = router.query
 
