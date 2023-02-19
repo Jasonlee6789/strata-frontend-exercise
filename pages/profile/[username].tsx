@@ -9,15 +9,16 @@ const User: FC = () => {
 	const { userLikes, setUserLikes } = useContext(UserLikesContext)
 
 	const router = useRouter()
-	let { username, profileImage } = router.query
+	let { username, profileImage = '' } = router.query
 
-	if (!username || !profileImage) {
+	// Add useEffect to check if running in the client and update state
+	useEffect(() => {
 		if (typeof window !== 'undefined') {
 			const params = new URLSearchParams(window.location.search)
 			username = params.get('username') as string
 			profileImage = params.get('profileImage') as string
 		}
-	}
+	}, [])
 	const incrementUserLike = (username: string) => {
 		setUserLikes((prevLikes) => ({
 			...prevLikes,
@@ -41,16 +42,31 @@ const User: FC = () => {
 	useEffect(() => {
 		fetchProfileData()
 	}, [])
+
+	useEffect(() => {
+		// Initialize user likes from local storage
+		const likesFromStorage = localStorage.getItem('userLikes')
+		if (likesFromStorage) {
+			setUserLikes(JSON.parse(likesFromStorage))
+		}
+	}, [])
+
+	useEffect(() => {
+		// Save user likes to local storage whenever it changes
+		localStorage.setItem('userLikes', JSON.stringify(userLikes))
+	}, [userLikes])
 	return (
 		<>
 			<div className="w-full h-80 flex flex-col items-center justify-center space-y-12">
 				<h1 className="text-4xl font-bold">User</h1>
-				<Image
-					width="100"
-					height="100"
-					src={`${profileImage}`}
-					alt={profileData?.username || ''}
-				/>
+				{profileImage && (
+					<Image
+						width="100"
+						height="100"
+						src={`${profileImage}`}
+						alt={profileData?.username || ''}
+					/>
+				)}
 				<div>{profileData?.username}</div>
 				<Button icon={<LikeOutlined />} onClick={handleLikeClick}>
 					Like {userLikes[username as string]}

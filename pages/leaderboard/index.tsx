@@ -21,7 +21,7 @@ const Leaderboard: FC = () => {
 	}, [])
 	return (
 		<>
-			<div className="w-full h-80 flex flex-col items-center justify-center space-y-12">
+			<div className="w-full h-80 mb-100 flex flex-col items-center justify-center space-y-12">
 				<h1 className="text-4xl font-bold">Leaderboard</h1>
 
 				<ul>
