@@ -101,6 +101,9 @@ const User: FC = () => {
 				>
 					Like {userLikes[username]}
 				</Button>
+				<Button onClick={() => router.push('/leaderboard')}>
+					Back to Leaderboard
+				</Button>
 			</div>
 		</>
 	)
