@@ -8,7 +8,7 @@ import { UserLikesContext } from '../../pages/_app'
 const User: FC = () => {
 	const { userLikes, setUserLikes, isLike, setIsLike } =
 		useContext(UserLikesContext)
-
+	// let localUser = user[`/api/profile/${username}`]
 	const router = useRouter()
 	let username = router.query.username as string
 	let profileImage = (router.query.profileImage as string) || ''
@@ -83,8 +83,8 @@ const User: FC = () => {
 	}, [])
 	return (
 		<>
-			<div className="w-full h-80 flex flex-col items-center justify-center space-y-12">
-				<h1 className="text-4xl font-bold">User</h1>
+			<div className="w-full h-80 flex flex-col items-center justify-center space-y-12 ">
+				<h1 className="text-4xl font-bold mt-40">User</h1>
 				{profileImage && (
 					<Image
 						width="100"
