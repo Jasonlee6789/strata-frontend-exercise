@@ -1,11 +1,13 @@
 import { FC, useEffect, useState, useContext } from 'react'
-import axios from 'axios'
+import fetchData from '../../lib/api'
 import Image from 'next/image'
 import { Button } from 'antd'
 import { LikeOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 import { UserLikesContext } from '../../pages/_app'
-const User: FC = () => {
+
+const User: FC = (user) => {
+	console.log(user)
 	const { userLikes, setUserLikes, isLike, setIsLike } =
 		useContext(UserLikesContext)
 	// let localUser = user[`/api/profile/${username}`]
@@ -14,23 +16,9 @@ const User: FC = () => {
 	let profileImage = (router.query.profileImage as string) || ''
 
 	// Add useEffect to check if running in the client and update state
-	useEffect(() => {
-		if (typeof window !== 'undefined') {
-			const params = new URLSearchParams(window.location.search)
-			username = params.get('username') as string
-			profileImage = params.get('profileImage') as string
-		}
-	}, [])
 
 	const [profileData, setProfileData] = useState<ProfileData>()
-	const fetchProfileData = async () => {
-		try {
-			const response = await axios.get(`/api/profile/${username}`)
-			setProfileData(response.data)
-		} catch (error) {
-			console.error(error)
-		}
-	}
+
 	const handleLikeClick = () => {
 		// Increment the number of likes for this user
 		if (isLike[username]) {
@@ -78,9 +66,6 @@ const User: FC = () => {
 		}
 	}, [userLikes, isLike])
 
-	useEffect(() => {
-		fetchProfileData()
-	}, [])
 	return (
 		<>
 			<div className="w-full h-80 flex flex-col items-center justify-center space-y-12 ">
@@ -89,11 +74,11 @@ const User: FC = () => {
 					<Image
 						width="100"
 						height="100"
-						src={`${profileImage}`}
-						alt={profileData?.username || ''}
+						src={profileImage}
+						alt={username || ''}
 					/>
 				)}
-				<div>{profileData?.username}</div>
+				<div>{username}</div>
 				<Button
 					className={isLike[username] ? 'bg-indigo-500' : ''}
 					icon={<LikeOutlined />}
@@ -109,4 +94,30 @@ const User: FC = () => {
 	)
 }
 
+export async function getStaticPaths() {
+	// Return a list of possible value for id
+	const profiles = await fetchData('leaderboard')
+	console.log(profiles)
+	const paths = profiles.leaderboard.map((profile: any) => ({
+		params: { username: profile.username.toString() },
+	}))
+
+	console.log(paths)
+	return {
+		paths,
+		fallback: false,
+	}
+}
+
+export async function getStaticProps({ params }: any) {
+	// Fetch necessary data for the blog post using params.id
+	const id = params?.username
+	const user = await fetchData(`profile/${id}`)
+	console.log(user)
+	return {
+		props: {
+			user,
+		},
+	}
+}
 export default User
