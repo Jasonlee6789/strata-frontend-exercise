@@ -70,14 +70,14 @@ const User: FC = (user) => {
 		<>
 			<div className="w-full h-80 flex flex-col items-center justify-center space-y-12 ">
 				<h1 className="text-4xl font-bold mt-40">User</h1>
-				{profileImage && (
-					<Image
-						width="100"
-						height="100"
-						src={profileImage}
-						alt={username || ''}
-					/>
-				)}
+
+				<Image
+					width="100"
+					height="100"
+					src={`/users/${username}.png`}
+					alt={username || ''}
+				/>
+
 				<div>{username}</div>
 				<Button
 					className={isLike[username] ? 'bg-indigo-500' : ''}
