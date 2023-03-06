@@ -4,20 +4,44 @@ import Image from 'next/image'
 import { Button } from 'antd'
 import { LikeOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/router'
-import { UserLikesContext } from '../../pages/_app'
 
-const User: FC = (user) => {
-	console.log(user)
-	const { userLikes, setUserLikes, isLike, setIsLike } =
-		useContext(UserLikesContext)
-	// let localUser = user[`/api/profile/${username}`]
+interface ProfileData {
+	username: string
+	profileImage?: string
+}
+
+const User: FC<{ user: ProfileData }> = () => {
 	const router = useRouter()
 	let username = router.query.username as string
-	let profileImage = (router.query.profileImage as string) || ''
+
+	const [userLikes, setUserLikes] = useState<{ [key: string]: number }>(
+		() => {
+			// Initialize user likes from local storage, or set to an empty object if not found
+			if (typeof window !== 'undefined') {
+				const storedLikes = localStorage.getItem('userLikes')
+				return storedLikes ? JSON.parse(storedLikes) : {}
+			} else {
+				return {}
+			}
+		}
+	)
+	const [isLike, setIsLike] = useState<{ [key: string]: boolean }>(() => {
+		// Initialize "isLike" status from local storage, or set to false for all users if not found
+		if (typeof window !== 'undefined') {
+			const storedIsLikes = localStorage.getItem('isLike')
+			if (storedIsLikes) {
+				return JSON.parse(storedIsLikes)
+			} else {
+				const initialLikes = username ? { [username]: false } : {}
+				return initialLikes
+			}
+		} else {
+			const initialLikes = username ? { [username]: false } : {}
+			return initialLikes
+		}
+	})
 
 	// Add useEffect to check if running in the client and update state
-
-	const [profileData, setProfileData] = useState<ProfileData>()
 
 	const handleLikeClick = () => {
 		// Increment the number of likes for this user
@@ -41,31 +65,11 @@ const User: FC = (user) => {
 			}))
 		}
 	}
-	useEffect(() => {
-		// Read user likes from local storage if available
-		const storedLikes = localStorage.getItem('userLikes')
-		const storedIsLikes = localStorage.getItem('isLike')
-		if (storedLikes) {
-			setUserLikes(JSON.parse(storedLikes))
-		}
-		if (storedIsLikes) {
-			setIsLike(JSON.parse(storedIsLikes))
-		}
-	}, [setUserLikes, setIsLike])
 
 	useEffect(() => {
-		const handleUnload = () => {
-			localStorage.setItem('userLikes', JSON.stringify(userLikes))
-			localStorage.setItem('isLike', JSON.stringify(isLike))
-		}
-
-		window.addEventListener('beforeunload', handleUnload)
-
-		return () => {
-			window.removeEventListener('beforeunload', handleUnload)
-		}
+		localStorage.setItem('userLikes', JSON.stringify(userLikes))
+		localStorage.setItem('isLike', JSON.stringify(isLike))
 	}, [userLikes, isLike])
-
 	return (
 		<>
 			<div className="w-full h-80 flex flex-col items-center justify-center space-y-12 ">
@@ -84,7 +88,7 @@ const User: FC = (user) => {
 					icon={<LikeOutlined />}
 					onClick={handleLikeClick}
 				>
-					Like {userLikes[username]}
+					Like {userLikes[username] || 0}
 				</Button>
 				<Button onClick={() => router.push('/leaderboard')}>
 					Back to Leaderboard
